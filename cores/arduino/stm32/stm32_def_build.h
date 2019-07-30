@@ -1,6 +1,7 @@
 #ifndef _STM32_DEF_BUILD_
 #define _STM32_DEF_BUILD_
 
+#if !defined(CMSIS_STARTUP_FILE) && !defined(CUSTOM_STARTUP_FILE)
 #if defined(STM32F030x6)
 #define CMSIS_STARTUP_FILE "startup_stm32f030x6.s"
 #elif defined(STM32F030x8)
@@ -147,6 +148,8 @@
 #define CMSIS_STARTUP_FILE "startup_stm32f722xx.s"
 #elif defined(STM32F723xx)
 #define CMSIS_STARTUP_FILE "startup_stm32f723xx.s"
+#elif defined(STM32F730xx)
+#define CMSIS_STARTUP_FILE "startup_stm32f730xx.s"
 #elif defined(STM32F732xx)
 #define CMSIS_STARTUP_FILE "startup_stm32f732xx.s"
 #elif defined(STM32F733xx)
@@ -155,6 +158,8 @@
 #define CMSIS_STARTUP_FILE "startup_stm32f745xx.s"
 #elif defined(STM32F746xx)
 #define CMSIS_STARTUP_FILE "startup_stm32f746xx.s"
+#elif defined(STM32F750xx)
+#define CMSIS_STARTUP_FILE "startup_stm32f750xx.s"
 #elif defined(STM32F756xx)
 #define CMSIS_STARTUP_FILE "startup_stm32f756xx.s"
 #elif defined(STM32F765xx)
@@ -167,6 +172,58 @@
 #define CMSIS_STARTUP_FILE "startup_stm32f777xx.s"
 #elif defined(STM32F779xx)
 #define CMSIS_STARTUP_FILE "startup_stm32f779xx.s"
+#elif defined(STM32G030xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g030xx.s"
+#elif defined(STM32G031xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g031xx.s"
+#elif defined(STM32G041xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g041xx.s"
+#elif defined(STM32G070xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g070xx.s"
+#elif defined(STM32G071xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g071xx.s"
+#elif defined(STM32G081xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g081xx.s"
+#elif defined(STM32G431xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g431xx.s"
+#elif defined(STM32G441xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g441xx.s"
+#elif defined(STM32G471xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g471xx.s"
+#elif defined(STM32G473xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g473xx.s"
+#elif defined(STM32G474xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g474xx.s"
+#elif defined(STM32G483xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g483xx.s"
+#elif defined(STM32G484xx)
+#define CMSIS_STARTUP_FILE "startup_stm32g484xx.s"
+#elif defined(STM32GBK1CB)
+#define CMSIS_STARTUP_FILE "startup_stm32gbk1cb.s"
+#elif defined(STM32H742xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h742xx.s"
+#elif defined(STM32H743xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h743xx.s"
+#elif defined(STM32H745xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h745xx.s"
+#elif defined(STM32H747xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h747xx.s"
+#elif defined(STM32H750xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h750xx.s"
+#elif defined(STM32H753xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h753xx.s"
+#elif defined(STM32H755xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h755xx.s"
+#elif defined(STM32H757xx)
+#define CMSIS_STARTUP_FILE "startup_stm32h757xx.s"
+#elif defined(STM32L010x4)
+#define CMSIS_STARTUP_FILE "startup_stm32l010x4.s"
+#elif defined(STM32L010x6)
+#define CMSIS_STARTUP_FILE "startup_stm32l010x6.s"
+#elif defined(STM32L010x8)
+#define CMSIS_STARTUP_FILE "startup_stm32l010x8.s"
+#elif defined(STM32L010xB)
+#define CMSIS_STARTUP_FILE "startup_stm32l010xb.s"
 #elif defined(STM32L011xx)
 #define CMSIS_STARTUP_FILE "startup_stm32l011xx.s"
 #elif defined(STM32L021xx)
@@ -243,6 +300,10 @@
 #define CMSIS_STARTUP_FILE "startup_stm32l162xdx.s"
 #elif defined(STM32L162xE)
 #define CMSIS_STARTUP_FILE "startup_stm32l162xe.s"
+#elif defined(STM32L412xx)
+#define CMSIS_STARTUP_FILE "startup_stm32l412xx.s"
+#elif defined(STM32L422xx)
+#define CMSIS_STARTUP_FILE "startup_stm32l422xx.s"
 #elif defined(STM32L431xx)
 #define CMSIS_STARTUP_FILE "startup_stm32l431xx.s"
 #elif defined(STM32L432xx)
@@ -285,7 +346,12 @@
 #define CMSIS_STARTUP_FILE "startup_stm32l4s7xx.s"
 #elif defined(STM32L4S9xx)
 #define CMSIS_STARTUP_FILE "startup_stm32l4s9xx.s"
+#elif defined(STM32WB55xx)
+#define CMSIS_STARTUP_FILE "startup_stm32wb55xx_cm4.s"
 #else
 #error UNKNOWN CHIP
 #endif
-#endif //_STM32_DEF_BUILD_
+#else
+#warning "No CMSIS startup file defined, custom one should be used"
+#endif /* !CMSIS_STARTUP_FILE && !CUSTOM_STARTUP_FILE */
+#endif /* _STM32_DEF_BUILD_ */

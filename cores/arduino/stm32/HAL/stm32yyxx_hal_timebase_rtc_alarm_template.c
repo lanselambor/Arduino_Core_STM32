@@ -1,5 +1,3 @@
-#include "stm32_def_build.h"
-
 #if 0
 #ifdef STM32F0xx
 #include "stm32f0xx_hal_timebase_rtc_alarm_template.c"
@@ -18,5 +16,14 @@
 #endif
 #ifdef STM32F7xx
 #include "stm32f7xx_hal_timebase_rtc_alarm_template.c"
+#endif
+#ifdef STM32G0xx
+#include "stm32g0xx_hal_timebase_rtc_alarm_template.c"
+#endif
+#ifdef STM32H7xx
+#include "stm32h7xx_hal_timebase_rtc_alarm_template.c"
+#endif
+#ifdef STM32WBxx
+#include "stm32wbxx_hal_timebase_rtc_alarm_template.c"
 #endif
 #endif /* 0 */

@@ -19,48 +19,39 @@
 #ifndef _VARIANT_ARDUINO_STM32_
 #define _VARIANT_ARDUINO_STM32_
 
-/*----------------------------------------------------------------------------
- *        Headers
- *----------------------------------------------------------------------------*/
-#include "PeripheralPins.h"
-
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif // __cplusplus
 
 /*----------------------------------------------------------------------------
  *        Pins
  *----------------------------------------------------------------------------*/
-extern const PinName digitalPin[];
 
-enum {
-  PA10, //D0
-  PA9,  //D1
-  PA12, //D2
-  PB0,  //D3
-  PB7,  //D4
-  PB6,  //D5
-  PB1,  //D6
-  PF0,  //D7
-  PF1,  //D8
-  PA8,  //D9
-  PA11, //D10
-  PB5,  //D11
-  PB4,  //D12
-  PB3,  //D13 - LED
-  PA0,  //D14/A0
-  PA1,  //D15/A1
-  PA3,  //D16/A2
-  PA4,  //D17/A3
-  PA5,  //D18/A4 - if SB18 ON (default) connected to PB7
-  PA6,  //D19/A5 - if SB16 ON (default) connected to PB6
-  PA7,  //D20/A6
-  PA2,  //D21/A7 - STLink Tx
-  PA15, //D22    - STLink Rx
-  PEND
-};
+#define PA10 0
+#define PA9  1
+#define PA12 2
+#define PB0  3
+#define PB7  4
+#define PB6  5
+#define PB1  6
+#define PF0  7
+#define PF1  8
+#define PA8  9
+#define PA11 10
+#define PB5  11
+#define PB4  12
+#define PB3  13 // LED
+#define PA0  14 // A0
+#define PA1  15 // A1
+#define PA3  16 // A2
+#define PA4  17 // A3
+#define PA5  18 // A4 - if SB18 ON (default) connected to PB7
+#define PA6  19 // A5 - if SB16 ON (default) connected to PB6
+#define PA7  20 // A6
+#define PA2  21 // A7 - STLink Tx
+#define PA15 22 // STLink Rx
 
-// This must be a literal with the same value as PEND
+// This must be a literal
 #define NUM_DIGITAL_PINS        23
 // This must be a literal with a value less than or equal to to MAX_ANALOG_INPUTS
 #define NUM_ANALOG_INPUTS       7
@@ -84,12 +75,15 @@ enum {
 // Do not use basic timer: OC is required
 #define TIMER_SERVO             TIM2  //TODO: advanced-control timers don't work
 
- // UART Definitions
+// UART Definitions
 #define SERIAL_UART_INSTANCE    2 //Connected to ST-Link
 
 // Serial Pin Firmata
 #define PIN_SERIAL_RX           PA15 // 22
 #define PIN_SERIAL_TX           PA2  // 21
+
+/* Extra HAL modules */
+#define HAL_DAC_MODULE_ENABLED
 
 #ifdef __cplusplus
 } // extern "C"

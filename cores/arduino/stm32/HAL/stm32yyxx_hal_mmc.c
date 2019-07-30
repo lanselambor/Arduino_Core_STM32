@@ -1,5 +1,3 @@
-#include "stm32_def_build.h"
-
 #ifdef STM32F1xx
 #include "stm32f1xx_hal_mmc.c"
 #endif
@@ -11,4 +9,10 @@
 #endif
 #ifdef STM32F7xx
 #include "stm32f7xx_hal_mmc.c"
+#endif
+#ifdef STM32H7xx
+#include "stm32h7xx_hal_mmc.c"
+#endif
+#ifdef STM32L4xx
+#include "stm32l4xx_hal_mmc.c"
 #endif

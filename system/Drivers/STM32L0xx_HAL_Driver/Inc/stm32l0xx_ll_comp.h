@@ -6,29 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright(c) 2016 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -82,22 +66,22 @@ typedef struct
 {
   uint32_t PowerMode;                   /*!< Set comparator operating mode to adjust power and speed.
                                              This parameter can be a value of @ref COMP_LL_EC_POWERMODE
-                                             
+
                                              This feature can be modified afterwards using unitary function @ref LL_COMP_SetPowerMode(). */
 
   uint32_t InputPlus;                   /*!< Set comparator input plus (non-inverting input).
                                              This parameter can be a value of @ref COMP_LL_EC_INPUT_PLUS
-                                             
+
                                              This feature can be modified afterwards using unitary function @ref LL_COMP_SetInputPlus(). */
 
   uint32_t InputMinus;                  /*!< Set comparator input minus (inverting input).
                                              This parameter can be a value of @ref COMP_LL_EC_INPUT_MINUS
-                                             
+
                                              This feature can be modified afterwards using unitary function @ref LL_COMP_SetInputMinus(). */
 
   uint32_t OutputPolarity;              /*!< Set comparator output polarity.
                                              This parameter can be a value of @ref COMP_LL_EC_OUTPUT_POLARITY
-                                             
+
                                              This feature can be modified afterwards using unitary function @ref LL_COMP_SetOutputPolarity(). */
 
 } LL_COMP_InitTypeDef;
@@ -326,7 +310,7 @@ __STATIC_INLINE uint32_t LL_COMP_GetCommonWindowMode(COMP_Common_TypeDef *COMPxy
   * @param  PowerMode This parameter can be one of the following values:
   *         @arg @ref LL_COMP_POWERMODE_MEDIUMSPEED   (1)
   *         @arg @ref LL_COMP_POWERMODE_ULTRALOWPOWER (1)
-  *         
+  *
   *         (1) Available only on COMP instance: COMP2.
   * @retval None
   */
@@ -343,7 +327,7 @@ __STATIC_INLINE void LL_COMP_SetPowerMode(COMP_TypeDef *COMPx, uint32_t PowerMod
   * @retval Returned value can be one of the following values:
   *         @arg @ref LL_COMP_POWERMODE_MEDIUMSPEED   (1)
   *         @arg @ref LL_COMP_POWERMODE_ULTRALOWPOWER (1)
-  *         
+  *
   *         (1) Available only on COMP instance: COMP2.
   */
 __STATIC_INLINE uint32_t LL_COMP_GetPowerMode(COMP_TypeDef *COMPx)
@@ -468,7 +452,7 @@ __STATIC_INLINE uint32_t LL_COMP_GetInputPlus(COMP_TypeDef *COMPx)
   *         @arg @ref LL_COMP_INPUT_MINUS_1_2VREFINT (*)
   *         @arg @ref LL_COMP_INPUT_MINUS_3_4VREFINT (*)
   *         @arg @ref LL_COMP_INPUT_MINUS_IO2        (*)
-  *         
+  *
   *         (*) Available only on COMP instance: COMP2.
   * @retval None
   */
@@ -494,7 +478,7 @@ __STATIC_INLINE void LL_COMP_SetInputMinus(COMP_TypeDef *COMPx, uint32_t InputMi
   *         @arg @ref LL_COMP_INPUT_MINUS_1_2VREFINT (*)
   *         @arg @ref LL_COMP_INPUT_MINUS_3_4VREFINT (*)
   *         @arg @ref LL_COMP_INPUT_MINUS_IO2        (*)
-  *         
+  *
   *         (*) Available only on COMP instance: COMP2.
   */
 __STATIC_INLINE uint32_t LL_COMP_GetInputMinus(COMP_TypeDef *COMPx)
@@ -520,7 +504,7 @@ __STATIC_INLINE uint32_t LL_COMP_GetInputMinus(COMP_TypeDef *COMPx)
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN1_COMP1 (*)
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN1_COMP2 (**)
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN2_COMP2 (**)
-  *         
+  *
   *         (*)  Available only on COMP instance: COMP1.\n
   *         (**) Available only on COMP instance: COMP2.
   * @retval None
@@ -540,7 +524,7 @@ __STATIC_INLINE void LL_COMP_SetOutputLPTIM(COMP_TypeDef *COMPx, uint32_t Output
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN1_COMP1 (*)
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN1_COMP2 (**)
   *         @arg @ref LL_COMP_OUTPUT_LPTIM1_IN2_COMP2 (**)
-  *         
+  *
   *         (*)  Available only on COMP instance: COMP1.\n
   *         (**) Available only on COMP instance: COMP2.
   */

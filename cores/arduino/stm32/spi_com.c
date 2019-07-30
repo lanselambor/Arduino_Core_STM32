@@ -35,91 +35,37 @@
   *
   ******************************************************************************
   */
-/** @addtogroup CMSIS
-  * @{
-  */
-
-/** @addtogroup stm32f4xx_system
-  * @{
-  */
-
-/** @addtogroup STM32F4xx_System_Private_Includes
-  * @{
-  */
+#include "core_debug.h"
 #include "stm32_def.h"
 #include "spi_com.h"
 #include "PinAF_STM32F1.h"
+#include "pinconfig.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+#if defined(HAL_SPI_MODULE_ENABLED)
 
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_Defines
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_TypesDefinitions
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_Variables
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_FunctionPrototypes
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @addtogroup STM32F4xx_System_Private_Functions
-  * @{
-  */
+/* Private Functions */
 /**
   * @brief  return clock freq of an SPI instance
   * @param  spi_inst : SPI instance
   * @retval clock freq of the instance else SystemCoreClock
   */
-uint32_t spi_getClkFreqInst(SPI_TypeDef * spi_inst)
+uint32_t spi_getClkFreqInst(SPI_TypeDef *spi_inst)
 {
   uint32_t spi_freq = SystemCoreClock;
 
-#ifdef STM32F0xx
+#if defined(STM32F0xx) || defined(STM32G0xx)
   UNUSED(spi_inst);
   /* SPIx source CLK is PCKL1 */
   spi_freq = HAL_RCC_GetPCLK1Freq();
 #else
-  if(spi_inst != NP) {
+  if (spi_inst != NP) {
     /* Get source clock depending on SPI instance */
     switch ((uint32_t)spi_inst) {
-#if defined(SPI1_BASE) || defined(SPI4_BASE) || defined(SPI5_BASE) || defined(SPI16_BASE)
-      /* Some STM32's (eg. STM32F302x8) have no SPI1, but do have SPI2/3. */
+#if defined(SPI1_BASE) || defined(SPI4_BASE) || defined(SPI5_BASE) || defined(SPI6_BASE)
+        /* Some STM32's (eg. STM32F302x8) have no SPI1, but do have SPI2/3. */
 #if defined SPI1_BASE
       case (uint32_t)SPI1:
 #endif
@@ -149,7 +95,7 @@ uint32_t spi_getClkFreqInst(SPI_TypeDef * spi_inst)
         break;
 #endif
       default:
-        printf("CLK: SPI instance not set");
+        core_debug("CLK: SPI instance not set");
         break;
     }
   }
@@ -167,12 +113,12 @@ uint32_t spi_getClkFreq(spi_t *obj)
   SPI_TypeDef *spi_inst = NP;
   uint32_t spi_freq = SystemCoreClock;
 
-  if(obj != NULL) {
-	spi_inst = pinmap_peripheral(obj->pin_sclk, PinMap_SPI_SCLK);
+  if (obj != NULL) {
+    spi_inst = pinmap_peripheral(obj->pin_sclk, PinMap_SPI_SCLK);
 
-    if(spi_inst != NP) {
+    if (spi_inst != NP) {
       spi_freq = spi_getClkFreqInst(spi_inst);
-	}
+    }
   }
   return spi_freq;
 }
@@ -187,13 +133,13 @@ uint32_t spi_getClkFreq(spi_t *obj)
   */
 void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
 {
-  if(obj == NULL)
+  if (obj == NULL) {
     return;
+  }
 
   SPI_HandleTypeDef *handle = &(obj->handle);
-  GPIO_InitTypeDef  GPIO_InitStruct;
-  GPIO_TypeDef *port;
   uint32_t spi_freq = 0;
+  uint32_t pull = 0;
 
   // Determine the SPI to use
   SPI_TypeDef *spi_mosi = pinmap_peripheral(obj->pin_mosi, PinMap_SPI_MOSI);
@@ -202,8 +148,8 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   SPI_TypeDef *spi_ssel = pinmap_peripheral(obj->pin_ssel, PinMap_SPI_SSEL);
 
   /* Pins MOSI/MISO/SCLK must not be NP. ssel can be NP. */
-  if(spi_mosi == NP || spi_miso == NP || spi_sclk == NP) {
-    printf("ERROR: at least one SPI pin has no peripheral\n");
+  if (spi_mosi == NP || spi_miso == NP || spi_sclk == NP) {
+    core_debug("ERROR: at least one SPI pin has no peripheral\n");
     return;
   }
 
@@ -213,8 +159,8 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   obj->spi = pinmap_merge_peripheral(spi_data, spi_cntl);
 
   // Are all pins connected to the same SPI instance?
-  if(obj->spi == NP) {
-    printf("ERROR: SPI pins mismatch\n");
+  if (obj->spi == NP) {
+    core_debug("ERROR: SPI pins mismatch\n");
     return;
   }
 
@@ -230,21 +176,21 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   handle->Init.Mode              = SPI_MODE_MASTER;
 
   spi_freq = spi_getClkFreqInst(obj->spi);
-  if(speed >= (spi_freq/SPI_SPEED_CLOCK_DIV2_MHZ)) {
+  if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV2_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  } else if(speed >= (spi_freq/SPI_SPEED_CLOCK_DIV4_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV4_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV8_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV8_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV16_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV16_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV32_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV32_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV64_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV64_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV128_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV128_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
-  } else if (speed >= (spi_freq/SPI_SPEED_CLOCK_DIV256_MHZ)) {
+  } else if (speed >= (spi_freq / SPI_SPEED_CLOCK_DIV256_MHZ)) {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   } else {
     handle->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
@@ -252,13 +198,13 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
 
   handle->Init.Direction         = SPI_DIRECTION_2LINES;
 
-  if((mode == SPI_MODE_0)||(mode == SPI_MODE_2)) {
+  if ((mode == SPI_MODE_0) || (mode == SPI_MODE_2)) {
     handle->Init.CLKPhase          = SPI_PHASE_1EDGE;
   } else {
     handle->Init.CLKPhase          = SPI_PHASE_2EDGE;
   }
 
-  if((mode == SPI_MODE_0)||(mode == SPI_MODE_1)) {
+  if ((mode == SPI_MODE_0) || (mode == SPI_MODE_1)) {
     handle->Init.CLKPolarity       = SPI_POLARITY_LOW;
   } else {
     handle->Init.CLKPolarity       = SPI_POLARITY_HIGH;
@@ -268,115 +214,65 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   handle->Init.CRCPolynomial     = 7;
   handle->Init.DataSize          = SPI_DATASIZE_8BIT;
 
-  if(msb == 0) {
+  if (msb == 0) {
     handle->Init.FirstBit          = SPI_FIRSTBIT_LSB;
   } else {
     handle->Init.FirstBit          = SPI_FIRSTBIT_MSB;
   }
 
   handle->Init.TIMode            = SPI_TIMODE_DISABLE;
-#if defined(STM32F0xx) || defined(STM32F3xx) || defined(STM32F7xx) || defined(STM32L4xx)
+#if defined(STM32F0xx) || defined(STM32F3xx) || defined(STM32F7xx) ||\
+    defined(STM32G0xx) || defined(STM32H7xx) || defined(STM32L4xx) ||\
+    defined(STM32WBxx)
   handle->Init.NSSPMode          = SPI_NSS_PULSE_DISABLE;
 #endif
 
-  if(obj->pin_mosi != NC) {
-    port = set_GPIO_Port_Clock(STM_PORT(obj->pin_mosi));
-    GPIO_InitStruct.Pin       = STM_GPIO_PIN(obj->pin_mosi);
-    GPIO_InitStruct.Mode      = STM_PIN_MODE(pinmap_function(obj->pin_mosi,PinMap_SPI_MOSI));
-    GPIO_InitStruct.Pull      = STM_PIN_PUPD(pinmap_function(obj->pin_mosi,PinMap_SPI_MOSI));
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-#ifdef STM32F1xx
-    pin_SetF1AFPin(STM_PIN_AFNUM(pinmap_function(obj->pin_mosi,PinMap_SPI_MOSI)));
-#else
-    GPIO_InitStruct.Alternate = STM_PIN_AFNUM(pinmap_function(obj->pin_mosi,PinMap_SPI_MOSI));
-#endif /* STM32F1xx */
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-  }
-
-  if(obj->pin_miso != NC) {
-    port = set_GPIO_Port_Clock(STM_PORT(obj->pin_miso));
-    GPIO_InitStruct.Pin       = STM_GPIO_PIN(obj->pin_miso);
-    GPIO_InitStruct.Mode      = STM_PIN_MODE(pinmap_function(obj->pin_miso,PinMap_SPI_MISO));
-    GPIO_InitStruct.Pull      = STM_PIN_PUPD(pinmap_function(obj->pin_miso,PinMap_SPI_MISO));
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-#ifdef STM32F1xx
-    pin_SetF1AFPin(STM_PIN_AFNUM(pinmap_function(obj->pin_miso,PinMap_SPI_MISO)));
-#else
-    GPIO_InitStruct.Alternate = STM_PIN_AFNUM(pinmap_function(obj->pin_miso,PinMap_SPI_MISO));
-#endif /* STM32F1xx */
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-  }
-
-  if(obj->pin_sclk != NC) {
-    port = set_GPIO_Port_Clock(STM_PORT(obj->pin_sclk));
-    GPIO_InitStruct.Pin       = STM_GPIO_PIN(obj->pin_sclk);
-    GPIO_InitStruct.Mode      = STM_PIN_MODE(pinmap_function(obj->pin_sclk,PinMap_SPI_SCLK));
-    /*
-     * According the STM32 Datasheet for SPI peripheral we need to PULLDOWN
-     * or PULLUP the SCK pin according the polarity used.
-     */
-    if(handle->Init.CLKPolarity == SPI_POLARITY_LOW) {
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-    } else {
-      GPIO_InitStruct.Pull = GPIO_PULLUP;
-    }
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-#ifdef STM32F1xx
-    pin_SetF1AFPin(STM_PIN_AFNUM(pinmap_function(obj->pin_sclk,PinMap_SPI_SCLK)));
-#else
-    GPIO_InitStruct.Alternate = STM_PIN_AFNUM(pinmap_function(obj->pin_sclk,PinMap_SPI_SCLK));
-#endif /* STM32F1xx */
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-  }
-
-  if(obj->pin_ssel != NC) {
-    port = set_GPIO_Port_Clock(STM_PORT(obj->pin_ssel));
-    GPIO_InitStruct.Pin       = STM_GPIO_PIN(obj->pin_ssel);
-    GPIO_InitStruct.Mode      = STM_PIN_MODE(pinmap_function(obj->pin_ssel,PinMap_SPI_SSEL));
-    GPIO_InitStruct.Pull      = STM_PIN_PUPD(pinmap_function(obj->pin_ssel,PinMap_SPI_SSEL));
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-#ifdef STM32F1xx
-    pin_SetF1AFPin(STM_PIN_AFNUM(pinmap_function(obj->pin_ssel,PinMap_SPI_SSEL)));
-#else
-    GPIO_InitStruct.Alternate = STM_PIN_AFNUM(pinmap_function(obj->pin_ssel,PinMap_SPI_SSEL));
-#endif /* STM32F1xx */
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-  }
+  /* Configure SPI GPIO pins */
+  pinmap_pinout(obj->pin_mosi, PinMap_SPI_MOSI);
+  pinmap_pinout(obj->pin_miso, PinMap_SPI_MISO);
+  pinmap_pinout(obj->pin_sclk, PinMap_SPI_SCLK);
+  /*
+   * According the STM32 Datasheet for SPI peripheral we need to PULLDOWN
+   * or PULLUP the SCK pin according the polarity used.
+   */
+  pull = (handle->Init.CLKPolarity == SPI_POLARITY_LOW) ? GPIO_PULLDOWN : GPIO_PULLUP;
+  pin_PullConfig(get_GPIO_Port(STM_PORT(obj->pin_sclk)), STM_LL_GPIO_PIN(obj->pin_sclk), pull);
+  pinmap_pinout(obj->pin_ssel, PinMap_SPI_SSEL);
 
 #if defined SPI1_BASE
   // Enable SPI clock
   if (handle->Instance == SPI1) {
-      __HAL_RCC_SPI1_CLK_ENABLE();
+    __HAL_RCC_SPI1_CLK_ENABLE();
   }
 #endif
 
 #if defined SPI2_BASE
   if (handle->Instance == SPI2) {
-      __HAL_RCC_SPI2_CLK_ENABLE();
+    __HAL_RCC_SPI2_CLK_ENABLE();
   }
 #endif
 
 #if defined SPI3_BASE
   if (handle->Instance == SPI3) {
-      __HAL_RCC_SPI3_CLK_ENABLE();
+    __HAL_RCC_SPI3_CLK_ENABLE();
   }
 #endif
 
 #if defined SPI4_BASE
   if (handle->Instance == SPI4) {
-      __HAL_RCC_SPI4_CLK_ENABLE();
+    __HAL_RCC_SPI4_CLK_ENABLE();
   }
 #endif
 
 #if defined SPI5_BASE
   if (handle->Instance == SPI5) {
-      __HAL_RCC_SPI5_CLK_ENABLE();
+    __HAL_RCC_SPI5_CLK_ENABLE();
   }
 #endif
 
 #if defined SPI6_BASE
   if (handle->Instance == SPI6) {
-      __HAL_RCC_SPI6_CLK_ENABLE();
+    __HAL_RCC_SPI6_CLK_ENABLE();
   }
 #endif
 
@@ -394,8 +290,9 @@ void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb)
   */
 void spi_deinit(spi_t *obj)
 {
-  if(obj == NULL)
+  if (obj == NULL) {
     return;
+  }
 
   SPI_HandleTypeDef *handle = &(obj->handle);
 
@@ -404,48 +301,48 @@ void spi_deinit(spi_t *obj)
 #if defined SPI1_BASE
   // Reset SPI and disable clock
   if (handle->Instance == SPI1) {
-      __HAL_RCC_SPI1_FORCE_RESET();
-      __HAL_RCC_SPI1_RELEASE_RESET();
-      __HAL_RCC_SPI1_CLK_DISABLE();
+    __HAL_RCC_SPI1_FORCE_RESET();
+    __HAL_RCC_SPI1_RELEASE_RESET();
+    __HAL_RCC_SPI1_CLK_DISABLE();
   }
 #endif
 #if defined SPI2_BASE
   if (handle->Instance == SPI2) {
-      __HAL_RCC_SPI2_FORCE_RESET();
-      __HAL_RCC_SPI2_RELEASE_RESET();
-      __HAL_RCC_SPI2_CLK_DISABLE();
+    __HAL_RCC_SPI2_FORCE_RESET();
+    __HAL_RCC_SPI2_RELEASE_RESET();
+    __HAL_RCC_SPI2_CLK_DISABLE();
   }
 #endif
 
 #if defined SPI3_BASE
   if (handle->Instance == SPI3) {
-      __HAL_RCC_SPI3_FORCE_RESET();
-      __HAL_RCC_SPI3_RELEASE_RESET();
-      __HAL_RCC_SPI3_CLK_DISABLE();
+    __HAL_RCC_SPI3_FORCE_RESET();
+    __HAL_RCC_SPI3_RELEASE_RESET();
+    __HAL_RCC_SPI3_CLK_DISABLE();
   }
 #endif
 
 #if defined SPI4_BASE
   if (handle->Instance == SPI4) {
-      __HAL_RCC_SPI4_FORCE_RESET();
-      __HAL_RCC_SPI4_RELEASE_RESET();
-      __HAL_RCC_SPI4_CLK_DISABLE();
+    __HAL_RCC_SPI4_FORCE_RESET();
+    __HAL_RCC_SPI4_RELEASE_RESET();
+    __HAL_RCC_SPI4_CLK_DISABLE();
   }
 #endif
 
 #if defined SPI5_BASE
   if (handle->Instance == SPI5) {
-      __HAL_RCC_SPI5_FORCE_RESET();
-      __HAL_RCC_SPI5_RELEASE_RESET();
-      __HAL_RCC_SPI5_CLK_DISABLE();
+    __HAL_RCC_SPI5_FORCE_RESET();
+    __HAL_RCC_SPI5_RELEASE_RESET();
+    __HAL_RCC_SPI5_CLK_DISABLE();
   }
 #endif
 
 #if defined SPI6_BASE
   if (handle->Instance == SPI6) {
-      __HAL_RCC_SPI6_FORCE_RESET();
-      __HAL_RCC_SPI6_RELEASE_RESET();
-      __HAL_RCC_SPI6_CLK_DISABLE();
+    __HAL_RCC_SPI6_FORCE_RESET();
+    __HAL_RCC_SPI6_RELEASE_RESET();
+    __HAL_RCC_SPI6_CLK_DISABLE();
   }
 #endif
 }
@@ -463,15 +360,15 @@ spi_status_e spi_send(spi_t *obj, uint8_t *Data, uint16_t len, uint32_t Timeout)
   spi_status_e ret = SPI_OK;
   HAL_StatusTypeDef hal_status;
 
-  if((obj == NULL) || (len == 0)) {
+  if ((obj == NULL) || (len == 0)) {
     return SPI_ERROR;
   }
 
   hal_status = HAL_SPI_Transmit(&(obj->handle), Data, len, Timeout);
 
-  if(hal_status == HAL_TIMEOUT) {
+  if (hal_status == HAL_TIMEOUT) {
     ret = SPI_TIMEOUT;
-  } else if(hal_status != HAL_OK) {
+  } else if (hal_status != HAL_OK) {
     ret = SPI_ERROR;
   }
 
@@ -488,39 +385,28 @@ spi_status_e spi_send(spi_t *obj, uint8_t *Data, uint16_t len, uint32_t Timeout)
   * @param  Timeout: Timeout duration in tick
   * @retval status of the send operation (0) in case of error
   */
-spi_status_e spi_transfer(spi_t *obj, uint8_t * tx_buffer,
-                      uint8_t * rx_buffer, uint16_t len, uint32_t Timeout)
+spi_status_e spi_transfer(spi_t *obj, uint8_t *tx_buffer,
+                          uint8_t *rx_buffer, uint16_t len, uint32_t Timeout)
 {
   spi_status_e ret = SPI_OK;
   HAL_StatusTypeDef hal_status;
 
-  if((obj == NULL) || (len == 0)) {
+  if ((obj == NULL) || (len == 0)) {
     return SPI_ERROR;
   }
 
   hal_status = HAL_SPI_TransmitReceive(&(obj->handle), tx_buffer, rx_buffer, len, Timeout);
 
-  if(hal_status == HAL_TIMEOUT) {
+  if (hal_status == HAL_TIMEOUT) {
     ret = SPI_TIMEOUT;
-  } else if(hal_status != HAL_OK) {
+  } else if (hal_status != HAL_OK) {
     ret = SPI_ERROR;
   }
 
   return ret;
 }
+#endif /* HAL_SPI_MODULE_ENABLED */
 
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

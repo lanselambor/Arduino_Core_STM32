@@ -1,6 +1,25 @@
 #ifndef _STM32_DEF_
 #define _STM32_DEF_
 
+
+/**
+ * @brief STM32 core version number
+ */
+#define STM32_CORE_VERSION_MAJOR    (0x01U) /*!< [31:24] major version */
+#define STM32_CORE_VERSION_MINOR    (0x07U) /*!< [23:16] minor version */
+#define STM32_CORE_VERSION_PATCH    (0x00U) /*!< [15:8]  patch version */
+/*
+ * Extra label for development:
+ * 0: official release
+ * [1-9]: release candidate
+ * F[0-9]: development
+ */
+#define STM32_CORE_VERSION_EXTRA    (0xF0U) /*!< [7:0]  extra version */
+#define STM32_CORE_VERSION          ((STM32_CORE_VERSION_MAJOR << 24U)\
+                                        |(STM32_CORE_VERSION_MINOR << 16U)\
+                                        |(STM32_CORE_VERSION_PATCH << 8U )\
+                                        |(STM32_CORE_VERSION_EXTRA))
+
 #define F_CPU SystemCoreClock
 #define USE_HAL_DRIVER
 
@@ -16,23 +35,23 @@
 #include "stm32f4xx.h"
 #elif defined(STM32F7xx)
 #include "stm32f7xx.h"
+#elif defined(STM32G0xx)
+#include "stm32g0xx.h"
+#elif defined(STM32G4xx)
+#include "stm32g4xx.h"
+#elif defined(STM32H7xx)
+#include "stm32h7xx.h"
 #elif defined(STM32L0xx)
 #include "stm32l0xx.h"
 #elif defined(STM32L1xx)
 #include "stm32l1xx.h"
 #elif defined(STM32L4xx)
 #include "stm32l4xx.h"
+#elif defined(STM32WBxx)
+#include "stm32wbxx.h"
 #else
 #error "STM32YYxx chip series is not defined in boards.txt."
 #endif
-
-// Include Low Layers drivers
-// LL raised several warnings, ignore them
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include "HAL/stm32yyxx_ll.h"
-#pragma GCC diagnostic pop
 
 // Here define some compatibility
 #ifndef CAN1
@@ -47,7 +66,7 @@
 #endif
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif // __cplusplus
 
 // weaked functions declaration

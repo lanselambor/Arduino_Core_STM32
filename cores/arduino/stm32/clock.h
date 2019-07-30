@@ -43,17 +43,25 @@
 #include "stm32_def.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Exported types ------------------------------------------------------------*/
+/* Clock source selection */
+typedef enum {
+  LSI_CLOCK,
+  HSI_CLOCK,
+  LSE_CLOCK,
+  HSE_CLOCK
+} sourceClock_t;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-uint32_t GetCurrentMilli(void);
-uint32_t GetCurrentMicro(void);
-void delayInsideIT(uint32_t delay_us);
+uint32_t getCurrentMillis(void);
+uint32_t getCurrentMicros(void);
 
+void enableClock(sourceClock_t source);
 #ifdef __cplusplus
 }
 #endif

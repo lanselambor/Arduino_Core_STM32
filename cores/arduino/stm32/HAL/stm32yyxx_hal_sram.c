@@ -1,5 +1,3 @@
-#include "stm32_def_build.h"
-
 #ifdef STM32F1xx
 #include "stm32f1xx_hal_sram.c"
 #endif
@@ -14,6 +12,12 @@
 #endif
 #ifdef STM32F7xx
 #include "stm32f7xx_hal_sram.c"
+#endif
+#ifdef STM32G4xx
+#include "stm32g4xx_hal_sram.c"
+#endif
+#ifdef STM32H7xx
+#include "stm32h7xx_hal_sram.c"
 #endif
 #ifdef STM32L1xx
 #include "stm32l1xx_hal_sram.c"
